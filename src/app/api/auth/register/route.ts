@@ -50,8 +50,21 @@ export async function POST(req: NextRequest) {
       .values({ name, email, username, passHash: hashPassword(password) })
       .returning({ id: users.id });
     userId = inserted[0].id;
-  } catch {
-    return NextResponse.redirect(requestUrl(req, "/register?error=exists"), 303);
+  } catch (error) {
+    const code =
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      typeof error.code === "string"
+        ? error.code
+        : undefined;
+
+    if (code === "23505") {
+      return NextResponse.redirect(requestUrl(req, "/register?error=exists"), 303);
+    }
+
+    console.error("Registration insert failed", { code: code ?? "unknown" });
+    return NextResponse.redirect(requestUrl(req, "/register?error=registration_failed"), 303);
   }
 
   const session = await createSessionRecord(userId, req.headers.get("user-agent") ?? "");

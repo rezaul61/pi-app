@@ -41,8 +41,21 @@ export async function registerAction(_prev: AuthState, formData: FormData): Prom
       .values({ name, email, username, passHash: hashPassword(password) })
       .returning({ id: users.id });
     userId = inserted[0].id;
-  } catch {
-    return { error: "That email or username is already registered." };
+  } catch (error) {
+    const code =
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      typeof error.code === "string"
+        ? error.code
+        : undefined;
+
+    if (code === "23505") {
+      return { error: "That email or username is already registered." };
+    }
+
+    console.error("Registration insert failed", { code: code ?? "unknown" });
+    return { error: "We couldn't create your account right now. Please try again shortly." };
   }
 
   await createSession(userId);

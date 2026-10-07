@@ -5,6 +5,7 @@ export const AUTH_ERROR_MESSAGES: Record<string, string> = {
   password_short: "Password must be at least 8 characters.",
   credentials: "Incorrect credentials. Try again.",
   exists: "That email or username is already registered.",
+  registration_failed: "We couldn't create your account right now. Please try again shortly.",
   signed_out: "Your session ended. Please sign in again.",
   role_required: "Choose the role that fits you best.",
   interests_required: "Pick at least two interests so PI can personalize your home.",
